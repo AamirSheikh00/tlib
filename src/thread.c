@@ -54,7 +54,7 @@ threadStack ts[2];
 static void* allocStack(size_t size){
     void *stack = malloc(size);
     if(posix_memalign(&stack,8,size) != 0){
-        perror("");
+        perror("Stack Allocation");
         return NULL;
     }
     return stack + size;
@@ -73,6 +73,7 @@ static void* allocStack(size_t size){
 //
 thread createOneOne(thread *t,void *attr,void * routine, void *arg){
     static int initState = 0;
+    tcb *thread_t = (tcb *)malloc(sizeof(tcb));
     thread tid;
     void *thread_stack;
 
@@ -102,6 +103,9 @@ thread createOneOne(thread *t,void *attr,void * routine, void *arg){
         ts[ts->size++].tid = tid;
         ts[ts->size++].stack = stack;
     #endif // !DEV
+    thread_t->tid = tid;
+    thread_t->stack = thread_stack;
+    thread_t->stack_sz = attr == NULL ? STACK_SZ : ((thread_attr *)attr)->stackSize;
     return tid;
 }
 
